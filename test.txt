@@ -1,0 +1,39 @@
+    dataset_train = read_csv(file_name)
+    #start to process chemistry data
+    c2h2_list = list(dataset_train['C2H2'])
+    h2_list = list(dataset_train['H2'])
+    ch4_list = list(dataset_train['CH4'])
+    c2h4_list = list(dataset_train['C2H4'])
+
+
+
+    '''
+    # 准备归一化数据格式
+    c2h2_np = c2h2_np.reshape((len(c2h2_np), 1))
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaler = scaler.fit(c2h2_np)
+    normalized = scaler.transform(c2h2_np)
+    print(normalized)
+    '''
+    #using 70% data to train and 30% data to test
+    #sequence = [i/float(length) for i in range(length)]
+    '''
+    如果是自然语言处理 (NLP) ，那么：
+    seq_len 将对应句子的长度
+    batch_size 同个批次中输入的句子数量
+    inp_dim 句子中用来表示每个单词（中文分词）的矢量维度
+    再举个例子，比如现在有5个句子，每个句子由3个单词组成，
+    每个单词用10维的向量组成，这样参数为：seq_len=3, batch=5, input_size=10.
+    '''
+
+plot
+
+r               红
+g              绿
+b              蓝
+c              蓝绿
+m            紫红
+y              黄
+k              黑
+w             白
+

@@ -44,19 +44,28 @@ def data_create(file_name):
             year=2021
         stamp = datetime(year, mon_day.tm_mon, mon_day.tm_mday)
         date_list.append(stamp.strftime('%Y-%m-%d'))
-
     #start to process chemistry data
-    c2h2_train = list(dataset_train['C2H2'])
-    h2_list = list(dataset_train['H2'])
-    ch4_list = list(dataset_train['CH4'])
-    c2h4_list = list(dataset_train['C2H4'])
-    for ch in c2h2_train:
-        c2h2_list.append(float(ch))
-    
+    dataset_all = read_csv(file_name)
+    for i in list(dataset_all['C2H2']):
+        c2h2_list.append(i)
+    for j in list(dataset_all['H2']):
+        h2_list.append(j)
+    for k in list(dataset_all['CH4']):
+        ch4_list.append(k) 
+    for m in list(dataset_all['C2H4']):
+        c2h4_list.append(m)
+    for n in list(dataset_all['C2H6']):
+        c2h6_list.append(n)
+
 def draw_data_gram():
     #x = range(len(step_place))
     plt.xticks(mon_local, mon_name,rotation=45)
     plt.plot(c2h2_list,'g',label="C2H2")
+    plt.plot(h2_list,'r',label="H2")
+    plt.plot(ch4_list,'b',label="CH4")
+    plt.plot(c2h4_list,'c',label="C2H4")
+    plt.plot(c2h6_list,'m',label="C2H6")
+    plt.legend(shadow=True)
     plt.show()
 
 
@@ -148,32 +157,16 @@ def predict_date_set(all_data,raw_data,train_size):
 if __name__=="__main__":
     data_create("./data/data.csv")
     #draw_data_gram()
+    #exit(0)
     if len(c2h2_list) == 0:
         print("data error")
         exit(0)
     #conver data to numpy array
     c2h2_np=np.array(c2h2_list)
-    '''
-    # 准备归一化数据格式
-    c2h2_np = c2h2_np.reshape((len(c2h2_np), 1))
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    scaler = scaler.fit(c2h2_np)
-    normalized = scaler.transform(c2h2_np)
-    print(normalized)
-    '''
-    #using 70% data to train and 30% data to test
-    #sequence = [i/float(length) for i in range(length)]
-    '''
-    如果是自然语言处理 (NLP) ，那么：
-    seq_len 将对应句子的长度
-    batch_size 同个批次中输入的句子数量
-    inp_dim 句子中用来表示每个单词（中文分词）的矢量维度
-    再举个例子，比如现在有5个句子，每个句子由3个单词组成，
-    每个单词用10维的向量组成，这样参数为：seq_len=3, batch=5, input_size=10.
-    '''
     
     data_X, data_Y =creat_dataset(c2h2_np,DAY_FOR_TRAIN)
 
+    # 70% data for training
     train_size = int(len(data_X) * 0.7)
     
     #data for training

@@ -23,7 +23,11 @@ c2h6_list=[]
 mon_name=[]
 mon_list =[12,1,2,3,4,5,6,7,8,9]
 mon_local=[0,14,46,73,103,123,136,166,196,229]
-
+loss_list=[]
+#===================================
+mod_path="./models/lstm1.pt"
+loss_path="./data/loss.npy"
+#===================================
 for mon in mon_list:
     if(mon == 12):
         mon_name.append("2020-"+str(mon))
@@ -59,13 +63,32 @@ def data_create(file_name):
 
 def draw_data_gram():
     #x = range(len(step_place))
-    plt.xticks(mon_local, mon_name,rotation=45)
+    plt.figure()
+    plt.subplot(5,1,1)
     plt.plot(c2h2_list,'g',label="C2H2")
-    plt.plot(h2_list,'r',label="H2")
+    plt.legend(shadow=True)
+    plt.xticks([])
+    #-----------------------------------
+    plt.subplot(5,1,2)
+    plt.plot(h2_list,'k',label="H2")
+    plt.legend(shadow=True)
+    plt.xticks([])
+    #-----------------------------------
+    plt.subplot(5,1,3)
     plt.plot(ch4_list,'b',label="CH4")
+    plt.legend(shadow=True)
+    plt.xticks([])
+    #-----------------------------------
+    plt.subplot(5,1,4)
     plt.plot(c2h4_list,'c',label="C2H4")
+    plt.xticks([])
+    plt.legend(shadow=True)
+    #-----------------------------------
+    plt.subplot(5,1,5)
     plt.plot(c2h6_list,'m',label="C2H6")
     plt.legend(shadow=True)
+    plt.xticks(mon_local, mon_name,rotation=45)
+
     plt.show()
 
 
@@ -123,14 +146,17 @@ def train_dataset(trainx,trainy,input_size):
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
+        loss_list.append(loss.item())
         if (i+1) % 100 == 0:
             print('Epoch: {}, Loss:{:.5f}'.format(i+1, loss.item()))
-    torch.save(lstm_module,"./models/lstm.pt")
+    loss_tensor=np.array(loss_list)
+    np.save(loss_path,loss_tensor) 
+    torch.save(lstm_module,mod_path)
 
-def predict_date_set(all_data,raw_data,train_size):
+def predict_data(all_data,raw_data,train_size):
     #model = lstm_module.eval()
     # find test size
-    model = torch.load('./models/lstm.pt')
+    model = torch.load(mod_path)
     dataset_x = all_data.reshape(-1, 1, DAY_FOR_TRAIN)
     dataset_x = torch.from_numpy(dataset_x).to(torch.float32)
     pred_test = model(dataset_x)
@@ -154,6 +180,7 @@ def predict_date_set(all_data,raw_data,train_size):
     plt.legend(shadow=True)
     plt.show()
 
+
 if __name__=="__main__":
     data_create("./data/data.csv")
     #draw_data_gram()
@@ -175,11 +202,10 @@ if __name__=="__main__":
     #data for testing
     test_X = data_X[train_size:]
     test_Y = data_Y[train_size:]
-    if os.path.exists("./models/lstm.pt") == False:
+    if os.path.exists(mod_path) == False:
         train_dataset(train_X,train_Y,DAY_FOR_TRAIN)
     
-    predict_date_set(data_X,c2h2_np,train_size)
-    
+    predict_data(data_X,c2h2_np,train_size)
 
 
 

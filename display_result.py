@@ -16,6 +16,16 @@ trans_data=[]
 raw_data_path="./data/data.csv"
 save_module_path="./models/"
 
+mon_list =[12,1,2,3,4,5,6,7,8,9]
+mon_local=[0,14,46,73,103,123,136,166,196,229]
+mon_name=[]
+for mon in mon_list:
+    if(mon == 12):
+        mon_name.append("2020-"+str(mon))
+    else:
+        mon_name.append("2021-"+str(mon))
+
+
 class LSTM_Module(nn.Module):
     """
         使用LSTM进行回归
@@ -63,15 +73,37 @@ def predict_all():
     data_trainx = np.asarray(dataset_x)
     total_len=data_trainx.shape[1]
     train_size = int((total_len) * train_percent)
-
+    predict_size = total_len-train_size
+    plt.figure()
     for i in range(SAMPLE_COL):
         load_path="./models/{}.pt".format(col_name[i])
         model = torch.load(load_path)
-        #model = model.eval()
+        model = model.eval()
         train_X = data_trainx[i].reshape(-1, 1, look_back)
         train_tx = torch.from_numpy(train_X).to(torch.float32)
         pred_test = model(train_tx)
         pred_test = pred_test.view(-1).data.numpy()
-        
+        pred_test = pred_test[train_size:]
+        xrange=range(train_size,train_size+predict_size)
+        plt.subplot(5,1,i+1)
+        plt.plot(trans_data[i],'b',label=col_name[i])
+        plt.plot(xrange,pred_test, 'r', label='prediction')
+        plt.legend(loc="upper left",fontsize=6,shadow=True)
+        plt.xticks([])
+        max_val =max(np.max(trans_data[i]),1)
+        plt.plot((train_size, train_size),(0,max_val), 'g--')  # 分割线 左边是训练数据 右边是测试数据的输出
+        if(col_name[i] == 'C2H2'):
+            plt.plot((0,total_len),(0.5,0.5),'g--',linewidth = 1)
+            plt.annotate('Alarm', xy=(40, 0.5), xytext=(50, 0.8),
+            xycoords='data',
+            arrowprops=dict(arrowstyle="->")
+            )
+            #plt.set_ylim(-2, 2)
+    plt.xticks(mon_local, mon_name,rotation=45)
+    #plt.savefig("result.png")
+    plt.savefig('predict.png',dpi=3840,format='png')
+    plt.show()
+    
+
 if __name__=="__main__":
     predict_all()

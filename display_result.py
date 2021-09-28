@@ -86,7 +86,7 @@ def predict_all():
         pred_test = pred_test[train_size:]
         xrange=range(train_size,train_size+predict_size)
         plt.subplot(5,1,i+1)
-        plt.plot(trans_data[i],'b',label=col_name[i])
+        plt.plot(trans_data[i][:-look_back],'b',label=col_name[i])
         plt.plot(xrange,pred_test, 'r', label='prediction')
         plt.legend(loc="upper left",fontsize=6,shadow=True)
         plt.xticks([])
